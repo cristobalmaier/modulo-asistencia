@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Asistencias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Selector de rol -->
+    <div class="role-selector" id="roleSelector">
+        <div class="role-modal">
+            <h2>Seleccionar Rol</h2>
+            <div class="role-buttons">
+                <button class="role-btn" data-role="admin">ADMIN</button>
+                <button class="role-btn" data-role="preceptor">Preceptor</button>
+                <button class="role-btn" data-role="directivo">Directivo</button>
+                <button class="role-btn" data-role="profesor">Profesor</button>
+                <button class="role-btn" data-role="alumno">Alumno</button>
+                <button class="role-btn" data-role="padre">Padre (Invitado)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-window" id="mainWindow" style="display: none;">
+        <!-- Barra de título -->
+        <div class="title-bar">
+            <div class="title-left">
+                <span class="current-role" id="currentRole"></span>
+                <span class="date-text" id="dateText">fecha de hoy</span>
+            </div>
+            <div class="title-right">
+                <button class="theme-toggle-btn" id="themeToggleBtn" title="Cambiar tema">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="change-role-btn" id="changeRoleBtn">Cambiar Rol</button>
+                <button class="close-btn" id="closeBtn">×</button>
+            </div>
+        </div>
+
+        <!-- Contenedor principal con dos paneles -->
+        <div class="container">
+            <!-- Panel izquierdo - Navegación -->
+            <div class="left-panel" id="leftPanel">
+                <!-- Los botones de navegación se generan dinámicamente según el rol -->
+            </div>
+
+            <!-- Panel derecho -->
+            <div class="right-panel" id="rightPanel">
+                <!-- Vista: Pasar Lista -->
+                <div class="view-content" id="viewPasarLista" style="display: none;">
+                    <h2 class="view-title">Pasar Lista</h2>
+                    <div class="input-area">
+                        <div class="filter-section">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Curso</label>
+                                    <select class="input-field" id="filterCurso">
+                                        <option value="">Seleccionar curso</option>
+                                        <option value="6°1">6°1</option>
+                                        <option value="6°2">6°2</option>
+                                        <option value="7°1">7°1</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="input-label">Alumno</label>
+                                    <input type="text" class="input-field" id="filterAlumno" placeholder="Buscar alumno...">
+                                </div>
+                            </div>
+                            <div class="filter-row" id="filterRowMateriaProfesor" style="display: none;">
+                                <div class="filter-group">
+                                    <label class="input-label">Materia</label>
+                                    <select class="input-field" id="filterMateria">
+                                        <option value="">Seleccionar materia</option>
+                                        <option value="matematica">Matemática</option>
+                                        <option value="lengua">Lengua</option>
+                                        <option value="ciencias">Ciencias</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="input-label">Profesor</label>
+                                    <input type="text" class="input-field" id="filterProfesor" placeholder="Nombre del profesor">
+                                </div>
+                            </div>
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Fecha</label>
+                                    <input type="date" class="input-field" id="filterFecha" value="">
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="btnBuscar">Buscar</button>
+                                <button class="action-btn secondary" id="btnEditarCurso" style="display: none;">Editar Curso</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attendance-list" id="attendanceList">
+                        <div class="attendance-header">
+                            <h3>Lista de Asistencia</h3>
+                            <div class="attendance-stats">
+                                <span class="stat-present">Presentes: <span id="countPresent">0</span></span>
+                                <span class="stat-absent">Ausentes: <span id="countAbsent">0</span></span>
+                            </div>
+                        </div>
+                        <div class="students-list" id="studentsList">
+                            <!-- Lista de estudiantes se genera dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="courses-carousel-container" id="coursesCarouselContainer" style="display: none;">
+                        <button class="carousel-arrow left" id="coursesCarouselLeft">←</button>
+                        <div class="courses-carousel-wrapper">
+                            <div class="courses-grid" id="coursesGrid">
+                                <!-- Grid de cursos con colores según si se pasó lista -->
+                            </div>
+                        </div>
+                        <button class="carousel-arrow right" id="coursesCarouselRight">→</button>
+                    </div>
+                </div>
+
+                <!-- Vista: Ver Informe -->
+                <div class="view-content" id="viewInforme" style="display: none;">
+                    <h2 class="view-title">Ver Informe de Asistencias</h2>
+                    <div class="input-area">
+                        <div class="filter-section">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Curso</label>
+                                    <select class="input-field" id="informeCurso">
+                                        <option value="">Todos los cursos</option>
+                                        <option value="6°1">6°1</option>
+                                        <option value="6°2">6°2</option>
+                                        <option value="7°1">7°1</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="input-label">Alumno</label>
+                                    <input type="text" class="input-field" id="informeAlumno" placeholder="Buscar alumno...">
+                                </div>
+                            </div>
+                            <div class="filter-row" id="informeRowMateriaProfesor" style="display: none;">
+                                <div class="filter-group">
+                                    <label class="input-label">Materia</label>
+                                    <select class="input-field" id="informeMateria">
+                                        <option value="">Todas las materias</option>
+                                        <option value="matematica">Matemática</option>
+                                        <option value="lengua">Lengua</option>
+                                        <option value="ciencias">Ciencias</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group" id="informeProfesorGroup" style="display: none;">
+                                    <label class="input-label">Profesor</label>
+                                    <input type="text" class="input-field" id="informeProfesor" placeholder="Nombre del profesor">
+                                </div>
+                            </div>
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Fecha desde</label>
+                                    <input type="date" class="input-field" id="informeFechaDesde">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="input-label">Fecha hasta</label>
+                                    <input type="date" class="input-field" id="informeFechaHasta">
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="btnGenerarInforme">Generar Informe</button>
+                                <button class="action-btn secondary" id="btnDescargarAlumno" style="display: none;">Descargar por Alumno</button>
+                                <button class="action-btn secondary" id="btnDescargarCurso" style="display: none;">Descargar por Curso</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-content" id="reportContent">
+                        <!-- Contenido del informe -->
+                    </div>
+                </div>
+
+                <!-- Vista: Calendario -->
+                <div class="view-content" id="viewCalendario" style="display: none;">
+                    <h2 class="view-title">Calendario</h2>
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button class="arrow-btn" id="prevMonth">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <h3 id="currentMonth"></h3>
+                            <button class="arrow-btn" id="nextMonth">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Calendario se genera dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="calendar-details" id="calendarDetails" style="display: none;">
+                        <h3 id="selectedDateTitle"></h3>
+                        <div class="filter-section">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Curso</label>
+                                    <select class="input-field" id="calendarCurso">
+                                        <option value="">Seleccionar curso</option>
+                                        <option value="6°1">6°1</option>
+                                        <option value="6°2">6°2</option>
+                                        <option value="7°1">7°1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="action-buttons" id="calendarActions">
+                                <!-- Acciones según el rol -->
+                            </div>
+                        </div>
+                        <div class="day-info" id="dayInfo">
+                            <!-- Información del día seleccionado -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista: Historial -->
+                <div class="view-content" id="viewHistorial" style="display: none;">
+                    <h2 class="view-title">Historial de Modificaciones</h2>
+                    <div class="input-area">
+                        <div class="filter-section">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Fecha desde</label>
+                                    <input type="date" class="input-field" id="historialFechaDesde">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="input-label">Fecha hasta</label>
+                                    <input type="date" class="input-field" id="historialFechaHasta">
+                                </div>
+                            </div>
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="input-label">Preceptor</label>
+                                    <input type="text" class="input-field" id="historialPreceptor" placeholder="Filtrar por preceptor">
+                                </div>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="btnBuscarHistorial">Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-content" id="historyContent">
+                        <!-- Historial de modificaciones -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const { createClient } = supabase
+        const _supabase = createClient('https://iuczwhplovsujjwlbzko.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Y3p3aHBsb3ZzdWpqd2xiemtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMzcwODgsImV4cCI6MjA3NjkxMzA4OH0.T5L1NzxqQ0D8iVGxRLMpTQvrQweYuwNe4gZE-MvA1Nw')
+      
+        console.log('Supabase Instance: ', _supabase)
+        // ...
+        async function fetchData() {
+            const { data, error } = await _supabase.from('users').select('*')
+            if (error) {
+                console.error('Error fetching data: ', error)
+            } else {
+                console.log('Data: ', data)
+            }
+        }
+        fetchData()
+      </script>
+
+</body>
+</html>
+
