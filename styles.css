@@ -438,10 +438,7 @@ body {
     transition: all 0.2s;
 }
 
-.student-item:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-hover);
-}
+
 
 .student-name {
     font-size: 16px;
@@ -472,10 +469,13 @@ body {
     border-color: #4caf50;
 }
 
+
 .attendance-btn.present.active {
     background: #4caf50;
     color: white;
 }
+
+
 
 .attendance-btn.absent {
     color: #c62828;
@@ -954,6 +954,16 @@ body {
     color: white;
     border-color: var(--accent-color);
     transform: scale(1.05);
+}
+
+.student-day-item.present .edit-attendance-btn:hover {
+    background: #b5d6b6;
+    border-color: #b5d6b6;
+}
+
+.student-day-item.absent .edit-attendance-btn:hover {
+    background: #dbafab;
+    border-color: #dbafab;
 }
 
 .edit-attendance-btn i {

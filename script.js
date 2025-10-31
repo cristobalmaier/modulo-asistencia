@@ -521,8 +521,123 @@ function generateReport() {
 }
 
 function downloadReport(type) {
-    alert(`Descargando informe por ${type === 'alumno' ? 'alumno' : 'curso'}...`);
-    // Aquí iría la lógica real de descarga
+    const curso = document.getElementById('informeCurso')?.value || 'todos';
+    const alumno = document.getElementById('informeAlumno')?.value || 'todos';
+    const materia = document.getElementById('informeMateria')?.value || 'todas';
+    
+    // Obtener datos de asistencia del localStorage
+    const attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || {};
+    
+    // Filtrar datos según el tipo de reporte
+    let filteredData = [];
+    
+    if (type === 'alumno' && alumno !== 'todos') {
+        // Filtrar por alumno específico
+        for (const date in attendanceData) {
+            const dayData = attendanceData[date];
+            const studentData = dayData[alumno];
+            
+            if (studentData && (curso === 'todos' || studentData.curso === curso) && 
+                (materia === 'todas' || studentData.materia === materia)) {
+                filteredData.push({
+                    fecha: date,
+                    nombre: studentData.nombre,
+                    curso: studentData.curso,
+                    materia: studentData.materia,
+                    estado: studentData.presente ? 'Presente' : 'Ausente',
+                    observaciones: studentData.observaciones || ''
+                });
+            }
+        }
+    } else if (type === 'curso' && curso !== 'todos') {
+        // Filtrar por curso específico
+        const studentsByCourse = {};
+        
+        // Agrupar por alumno y contar asistencias
+        for (const date in attendanceData) {
+            const dayData = attendanceData[date];
+            
+            for (const studentId in dayData) {
+                const studentData = dayData[studentId];
+                
+                if (studentData.curso === curso && (materia === 'todas' || studentData.materia === materia)) {
+                    if (!studentsByCourse[studentId]) {
+                        studentsByCourse[studentId] = {
+                            nombre: studentData.nombre,
+                            total: 0,
+                            presentes: 0,
+                            ausentes: 0
+                        };
+                    }
+                    
+                    studentsByCourse[studentId].total++;
+                    if (studentData.presente) {
+                        studentsByCourse[studentId].presentes++;
+                    } else {
+                        studentsByCourse[studentId].ausentes++;
+                    }
+                }
+            }
+        }
+        
+        // Convertir a array para el reporte
+        filteredData = Object.entries(studentsByCourse).map(([id, data]) => ({
+            alumno: data.nombre,
+            total_clases: data.total,
+            asistencias: data.presentes,
+            inasistencias: data.ausentes,
+            porcentaje_asistencia: data.total > 0 ? Math.round((data.presentes / data.total) * 100) : 0
+        }));
+    }
+    
+    if (filteredData.length === 0) {
+        alert('No hay datos para generar el reporte con los filtros seleccionados.');
+        return;
+    }
+    
+    // Crear archivo Excel
+    let csvContent = '';
+    
+    if (type === 'alumno') {
+        // Encabezados para reporte por alumno
+        csvContent = 'Fecha,Nombre,Curso,Materia,Estado,Observaciones\n';
+        
+        // Agregar datos
+        filteredData.forEach(item => {
+            csvContent += `"${item.fecha}","${item.nombre}","${item.curso}","${item.materia}","${item.estado}","${item.observaciones}"\n`;
+        });
+        
+        // Crear y descargar archivo
+        downloadCSV(csvContent, `asistencia_${alumno}_${new Date().toISOString().split('T')[0]}.csv`);
+    } else if (type === 'curso') {
+        // Encabezados para reporte por curso
+        csvContent = 'Alumno,Total Clases,Asistencias,Inasistencias,% Asistencia\n';
+        
+        // Agregar datos
+        filteredData.forEach(item => {
+            csvContent += `"${item.alumno}",${item.total_clases},${item.asistencias},${item.inasistencias},${item.porcentaje_asistencia}%\n`;
+        });
+        
+        // Crear y descargar archivo
+        downloadCSV(csvContent, `asistencia_${curso}_${new Date().toISOString().split('T')[0]}.csv`);
+    }
+}
+
+function downloadCSV(csvContent, fileName) {
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar
+    setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }, 100);
 }
 
 // Vista: Calendario
@@ -997,8 +1112,45 @@ function setTheme(theme) {
     }
 }
 
+// Función para inicializar datos de prueba
+function initTestData() {
+    if (!localStorage.getItem('attendanceData')) {
+        const today = new Date();
+        const dateKey = getDateKey(today);
+        
+        const testData = {
+            [dateKey]: {
+                'alumno1': {
+                    nombre: 'Juan Pérez',
+                    curso: '6°1',
+                    materia: 'Matemática',
+                    presente: true,
+                    observaciones: ''
+                },
+                'alumno2': {
+                    nombre: 'María García',
+                    curso: '6°1',
+                    materia: 'Matemática',
+                    presente: false,
+                    observaciones: 'Justificada'
+                },
+                'alumno3': {
+                    nombre: 'Carlos López',
+                    curso: '6°2',
+                    materia: 'Lengua',
+                    presente: true,
+                    observaciones: ''
+                }
+            }
+        };
+        
+        localStorage.setItem('attendanceData', JSON.stringify(testData));
+    }
+}
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
+    initTestData();
     updateDate();
     setupCloseButton();
     setupChangeRoleButton();

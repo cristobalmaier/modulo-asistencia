@@ -252,22 +252,6 @@
 
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const { createClient } = supabase
-        const _supabase = createClient('https://iuczwhplovsujjwlbzko.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1Y3p3aHBsb3ZzdWpqd2xiemtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMzcwODgsImV4cCI6MjA3NjkxMzA4OH0.T5L1NzxqQ0D8iVGxRLMpTQvrQweYuwNe4gZE-MvA1Nw')
-      
-        console.log('Supabase Instance: ', _supabase)
-        // ...
-        async function fetchData() {
-            const { data, error } = await _supabase.from('users').select('*')
-            if (error) {
-                console.error('Error fetching data: ', error)
-            } else {
-                console.log('Data: ', data)
-            }
-        }
-        fetchData()
-      </script>
 
 </body>
 </html>
