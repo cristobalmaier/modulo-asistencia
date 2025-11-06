@@ -48,6 +48,36 @@
 
             <!-- Panel derecho -->
             <div class="right-panel" id="rightPanel">
+
+                <!-- Vista: Resumen / Dashboard -->
+                <div class="view-content" id="viewDashboard" style="display: none;">
+                    <h2 class="view-title">Resumen Inicial</h2>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card" id="cardAttendancePercent">
+                            <h4>Porcentaje general de asistencia</h4>
+                            <div class="dashboard-value" id="attendancePercent">--%</div>
+                        </div>
+                        <div class="dashboard-card" id="cardTopAbsences">
+                            <h4>Estudiantes con mayor inasistencia</h4>
+                            <ul id="topAbsenteesList" class="compact-list">
+                                <!-- Lista generada dinámicamente -->
+                            </ul>
+                        </div>
+                        <div class="dashboard-card" id="cardUpcomingEvents">
+                            <h4>Próximos eventos</h4>
+                            <ul id="upcomingEventsList" class="compact-list">
+                                <!-- Eventos generados dinámicamente -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-actions" style="margin-top:16px;">
+                        <button class="action-btn" id="btnExportPDF">Exportar Reporte (PDF)</button>
+                        <button class="action-btn" id="btnExportExcel">Exportar Reporte (Excel)</button>
+                        <button class="action-btn secondary" id="btnSendNotification">Enviar notificación</button>
+                        <button class="action-btn secondary" id="btnOpenMessaging">Abrir mensajería</button>
+                    </div>
+                </div>
                 <!-- Vista: Pasar Lista -->
                 <div class="view-content" id="viewPasarLista" style="display: none;">
                     <h2 class="view-title">Pasar Lista</h2>
@@ -250,6 +280,17 @@
         </div>
     </div>
 
+    <!-- Libraries for export and PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="" crossorigin="anonymous"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+    <!-- App modules -->
+    <script src="src/notifications.js"></script>
+    <script src="src/messaging.js"></script>
+    <script src="src/export.js"></script>
+    <script src="src/dashboard.js"></script>
+
+    <!-- Main app -->
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 

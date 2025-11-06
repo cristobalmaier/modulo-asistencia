@@ -11,7 +11,7 @@ const roles = {
             historial: true,
             todasVistas: true
         },
-        navItems: ['pasar lista', 'ver informe', 'calendario', 'historial']
+        navItems: ['resumen', 'pasar lista', 'ver informe', 'calendario', 'historial']
     },
     preceptor: {
         name: 'Preceptor',
@@ -24,7 +24,7 @@ const roles = {
             verColoresCursos: true,
             descargarInforme: true
         },
-        navItems: ['pasar lista', 'ver informe', 'calendario', 'historial']
+        navItems: ['resumen', 'pasar lista', 'ver informe', 'calendario', 'historial']
     },
     directivo: {
         name: 'Directivo',
@@ -35,7 +35,7 @@ const roles = {
             historial: true,
             descargarInforme: true
         },
-        navItems: ['ver informe', 'calendario', 'historial']
+        navItems: ['resumen', 'ver informe', 'calendario', 'historial']
     },
     profesor: {
         name: 'Profesor',
@@ -46,7 +46,7 @@ const roles = {
             historial: false,
             editarCurso: true
         },
-        navItems: ['pasar lista', 'ver informe', 'calendario']
+        navItems: ['resumen', 'pasar lista', 'ver informe', 'calendario']
     },
     alumno: {
         name: 'Alumno',
@@ -56,7 +56,7 @@ const roles = {
             calendario: true,
             historial: false
         },
-        navItems: ['ver informe', 'calendario']
+        navItems: ['resumen', 'ver informe', 'calendario']
     },
     padre: {
         name: 'Padre (Invitado)',
@@ -66,7 +66,7 @@ const roles = {
             calendario: false,
             historial: false
         },
-        navItems: ['ver informe']
+        navItems: ['resumen', 'ver informe']
     }
 };
 
@@ -216,6 +216,7 @@ function showView(viewName) {
     
     // Mostrar vista correspondiente
     const viewMap = {
+        'resumen': 'viewDashboard',
         'pasar lista': 'viewPasarLista',
         'ver informe': 'viewInforme',
         'calendario': 'viewCalendario',
@@ -236,6 +237,13 @@ function showView(viewName) {
                 initPasarLista();
             } else if (viewName === 'ver informe') {
                 initInforme();
+            } else if (viewName === 'resumen') {
+                // inicializar dashboard si existe el módulo
+                try {
+                    if (typeof window.initDashboard === 'function') window.initDashboard();
+                } catch (e) {
+                    console.warn('initDashboard no disponible', e);
+                }
             } else if (viewName === 'historial') {
                 initHistorial();
             }
